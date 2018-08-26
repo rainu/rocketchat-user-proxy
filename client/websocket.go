@@ -25,8 +25,11 @@ type RocketChat interface {
 	//LogsOut the user
 	Logout()
 
-	//Send a message to the given recipients
-	SendMessage(string, ...string)
+	//Send a direct message to the given recipients
+	SendDirectMessage(string, ...string)
+
+	//Send a message to the given rooms
+	SendRoomMessage(string, ...string)
 }
 
 type rcClient struct {
@@ -39,6 +42,7 @@ type rcClient struct {
 	history History
 
 	userDictionary map[string]string
+	roomDictionary map[string]string
 
 	chanSenderClose   chan interface{}
 	chanReceiverClose chan interface{}
@@ -50,6 +54,7 @@ func NewRocketChat(url string) RocketChat {
 		url:            url,
 		history:        NewHistory(),
 		userDictionary: make(map[string]string),
+		roomDictionary: make(map[string]string),
 	}
 }
 
