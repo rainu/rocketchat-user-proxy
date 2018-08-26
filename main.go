@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"rocketchat-user-proxy/client"
+	"rocketchat-user-proxy/config"
 	"rocketchat-user-proxy/log"
 	"rocketchat-user-proxy/server"
 	"syscall"
@@ -14,7 +15,9 @@ import (
 )
 
 func main() {
-	rc := client.NewRocketChat("url")
+	cfg := config.New()
+
+	rc := client.NewRocketChat(cfg.Url)
 	err := rc.Start()
 
 	if err != nil {
@@ -22,9 +25,13 @@ func main() {
 		return
 	}
 
-	rc.LoginWithPassword("user", "password")
+	if cfg.PasswordHash != "" {
+		rc.LoginWithHash(cfg.Username, cfg.PasswordHash)
+	} else {
+		rc.LoginWithPassword(cfg.Username, cfg.PasswordPlain)
+	}
 
-	httpServer := startServer(rc)
+	httpServer := startServer(rc, cfg)
 
 	//wait for interruption
 	stop := make(chan os.Signal, 1)
@@ -36,9 +43,9 @@ func main() {
 	rc.Stop()
 }
 
-func startServer(chat client.RocketChat) *http.Server {
+func startServer(chat client.RocketChat, cfg *config.Config) *http.Server {
 	router := server.NewRouter(chat)
-	httpServer := &http.Server{Addr: fmt.Sprintf(":%v", 8080), Handler: router}
+	httpServer := &http.Server{Addr: fmt.Sprintf(":%v", cfg.BindPort), Handler: router}
 
 	go func() {
 		httpServer.ListenAndServe()
