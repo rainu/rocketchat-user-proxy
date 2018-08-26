@@ -32,7 +32,7 @@ func (h *history) AddIncomingMessage(message string) {
 	genResp := &messages.GeneralResponse{}
 	err := json.Unmarshal([]byte(message), genResp)
 
-	if err == nil {
+	if err == nil && genResp.Msg == "result" {
 		//we only want to store relational messages
 		h.in[genResp.Id] = message
 

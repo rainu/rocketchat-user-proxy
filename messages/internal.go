@@ -1,7 +1,7 @@
 package messages
 
 import (
-	"strconv"
+	"fmt"
 	"time"
 )
 
@@ -19,7 +19,7 @@ type MethodCall struct {
 
 func NewMethodCall(method string, params []interface{}) *MethodCall {
 	return &MethodCall{
-		Id:     strconv.Itoa(time.Now().Nanosecond()),
+		Id:     genUniqueId(),
 		Msg:    "method",
 		Method: method,
 		Params: params,
@@ -48,4 +48,8 @@ func NewPingResponse() *PingResponse {
 	return &PingResponse{
 		Msg: "ping",
 	}
+}
+
+func genUniqueId() string {
+	return fmt.Sprintf("%d", time.Now().UnixNano())
 }

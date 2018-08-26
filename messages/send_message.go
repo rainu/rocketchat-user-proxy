@@ -1,10 +1,5 @@
 package messages
 
-import (
-	"fmt"
-	"time"
-)
-
 type Message struct {
 	Id      string `json:"_id"`
 	RoomId  string `json:"rid"`
@@ -27,8 +22,4 @@ func NewSendMessage(roomId, message string) *MethodCall {
 	}
 
 	return NewMethodCall("sendMessage", params)
-}
-
-func genUniqueId() string {
-	return fmt.Sprintf("%d", time.Now().UnixNano())
 }

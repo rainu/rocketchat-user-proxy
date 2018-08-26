@@ -38,6 +38,8 @@ type rcClient struct {
 
 	history History
 
+	userDictionary map[string]string
+
 	chanSenderClose   chan interface{}
 	chanReceiverClose chan interface{}
 	waitGroup         sync.WaitGroup
@@ -45,8 +47,9 @@ type rcClient struct {
 
 func NewRocketChat(url string) RocketChat {
 	return &rcClient{
-		url:     url,
-		history: NewHistory(),
+		url:            url,
+		history:        NewHistory(),
+		userDictionary: make(map[string]string),
 	}
 }
 
