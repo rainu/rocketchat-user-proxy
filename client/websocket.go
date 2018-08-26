@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
 	"rocketchat-user-proxy/log"
@@ -10,17 +11,33 @@ import (
 
 type RocketChat interface {
 	//Establish the connection an waits for in-/output messages
-	Start() (chan<- interface{}, <-chan []byte, error)
+	Start() error
 
 	//Stops the client. It blocks until all internal routines are finished
 	Stop()
+
+	//LogsIn a user with the given plain password
+	LoginWithPassword(string, string)
+
+	//LogIn a user with the given sha-256 hashed password
+	LoginWithHash(string, string)
+
+	//LogsOut the user
+	Logout()
+
+	//Send a message to the given recipients
+	SendMessage(string, ...string)
 }
 
 type rcClient struct {
-	url               string
-	con               *websocket.Conn
-	chanIn            chan interface{}
-	chanOut           chan []byte
+	url string
+	con *websocket.Conn
+
+	chanIn  chan interface{}
+	chanOut chan []byte
+
+	history History
+
 	chanSenderClose   chan interface{}
 	chanReceiverClose chan interface{}
 	waitGroup         sync.WaitGroup
@@ -28,28 +45,29 @@ type rcClient struct {
 
 func NewRocketChat(url string) RocketChat {
 	return &rcClient{
-		url: url,
+		url:     url,
+		history: NewHistory(),
 	}
 }
 
-func (rc *rcClient) Start() (chan<- interface{}, <-chan []byte, error) {
+func (rc *rcClient) Start() error {
 	var err error
 	rc.con, _, err = websocket.DefaultDialer.Dial(rc.url, nil)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "Could not connect to RocketChat!")
+		return errors.Wrap(err, "Could not connect to RocketChat!")
 	}
 	log.Info.Println("Establish connection to " + rc.url)
 
 	//first message have to be an "connection message"
 	err = rc.con.WriteJSON(messages.NewConnect())
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "Failed to send the Connect-Message!")
+		return errors.Wrap(err, "Failed to send the Connect-Message!")
 	}
 
 	rc.startSender()
 	rc.startReceiver()
 
-	return rc.chanIn, rc.chanOut, nil
+	return nil
 }
 
 func (rc *rcClient) Stop() {
@@ -131,10 +149,19 @@ func (rc *rcClient) startReceiver() {
 func (rc *rcClient) handleMessageBeforeProvide(message string) bool {
 	log.Trace.Printf("[IN] %s\n", message)
 
-	if message == `{"msg":"ping"}` {
-		//we have to pong :D
-		rc.chanIn <- messages.NewPingResponse()
-		return false
+	//try to convert in GeneralMessage
+	genResp := &messages.GeneralResponse{}
+	err := json.Unmarshal([]byte(message), genResp)
+
+	if err == nil {
+		switch genResp.Msg {
+		case "ping":
+			//we have to pong :D
+			rc.chanIn <- messages.NewPingResponse()
+			return false
+		default:
+			rc.history.AddIncomingMessage(message)
+		}
 	}
 
 	return true

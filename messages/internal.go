@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+type GeneralResponse struct {
+	Id  string `json:"id"`
+	Msg string `json:"msg"`
+}
+
 type MethodCall struct {
 	Id     string        `json:"id"`
 	Msg    string        `json:"msg"`
