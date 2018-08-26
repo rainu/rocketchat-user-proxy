@@ -38,3 +38,7 @@ func NewLoginHash(username, passwordHash string) *MethodCall {
 
 	return NewMethodCall("login", params)
 }
+
+func NewLogout() *MethodCall {
+	return NewMethodCall("logout", []interface{}{})
+}
