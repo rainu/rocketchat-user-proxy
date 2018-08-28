@@ -36,15 +36,13 @@ type rcClient struct {
 	url string
 	con *websocket.Conn
 
-	chanIn  chan interface{}
-	chanOut chan []byte
+	chanIn chan interface{}
 
 	history History
 
 	userDictionary map[string]string
 	roomDictionary map[string]string
 
-	chanSenderClose   chan interface{}
 	chanReceiverClose chan interface{}
 	waitGroup         sync.WaitGroup
 }
@@ -80,40 +78,38 @@ func (rc *rcClient) Start() error {
 
 func (rc *rcClient) Stop() {
 	//send close signal
-	rc.chanSenderClose <- 1
+	close(rc.chanIn)
 	rc.chanReceiverClose <- 1
-	rc.con.Close()
 
 	//wait for go routines to finish
 	rc.waitGroup.Wait()
+
+	rc.con.Close()
 }
 
 func (rc *rcClient) startSender() {
 	rc.chanIn = make(chan interface{}, 1)
-	rc.chanSenderClose = make(chan interface{}, 1)
 	rc.waitGroup.Add(1)
 
 	go func() {
 		defer rc.waitGroup.Done()
 		for {
-			select {
-			case <-rc.chanSenderClose:
+			call, open := <-rc.chanIn
+			if !open {
 				//close signal received: that means we have to go
 				return
-			case call := <-rc.chanIn:
-				log.Trace.Printf("[OUT] %+v\n", call)
-				err := rc.con.WriteJSON(call)
+			}
+			log.Trace.Printf("[OUT] %+v\n", call)
+			err := rc.con.WriteJSON(call)
 
-				if err != nil {
-					log.Error.Printf("Error sending Message: %v", err)
-				}
+			if err != nil {
+				log.Error.Printf("Error sending Message: %v", err)
 			}
 		}
 	}()
 }
 
 func (rc *rcClient) startReceiver() {
-	rc.chanOut = make(chan []byte, 100)
 	rc.chanReceiverClose = make(chan interface{}, 1)
 	rc.waitGroup.Add(1)
 
@@ -143,18 +139,14 @@ func (rc *rcClient) startReceiver() {
 				return
 			case resp := <-internalChan:
 				if resp.err == nil {
-					providable := rc.handleMessageBeforeProvide(string(resp.message))
-
-					if providable {
-						rc.chanOut <- resp.message
-					}
+					rc.handleMessage(string(resp.message))
 				}
 			}
 		}
 	}()
 }
 
-func (rc *rcClient) handleMessageBeforeProvide(message string) bool {
+func (rc *rcClient) handleMessage(message string) {
 	log.Trace.Printf("[IN] %s\n", message)
 
 	//try to convert in GeneralMessage
@@ -166,11 +158,8 @@ func (rc *rcClient) handleMessageBeforeProvide(message string) bool {
 		case "ping":
 			//we have to pong :D
 			rc.chanIn <- messages.NewPingResponse()
-			return false
 		default:
 			rc.history.AddIncomingMessage(message)
 		}
 	}
-
-	return true
 }
