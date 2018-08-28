@@ -1,0 +1,10 @@
+stages:
+  - dockerize
+
+dockerize:
+  image: docker
+  stage: dockerize
+  script:
+    - docker build . -t rainu/rocketchat-user-proxy
+    - docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
+    - docker push rainu/rocketchat-user-proxy
