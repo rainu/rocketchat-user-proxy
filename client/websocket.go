@@ -30,6 +30,15 @@ type RocketChat interface {
 
 	//Send a message to the given rooms
 	SendRoomMessage(string, ...string)
+
+	//Delete a message by the given message id
+	DeleteMessage(string)
+
+	//Trigger a user :D
+	TriggerUser(string, ...string)
+
+	//Trigger a whole room :D
+	TriggerRoom(string, ...string)
 }
 
 type rcClient struct {

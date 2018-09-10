@@ -20,14 +20,24 @@ You have to replace *<chat-host>*, *<chat-username>*, *<chat-user-password>* wit
 
 ## Usage example
 
-Send a message to the user **rainu**
+Sends a message to the user **rainu**
 ```sh
 curl -X POST -v localhost:8080/api/v1/send/u/rainu --data 'Hello rainu!'
 ```
 
-Send a message to the room **public**
+Sends a message to the room **public**
 ```sh
 curl -X POST -v localhost:8080/api/v1/send/r/public --data 'Hello public World!'
+```
+
+Trigger the user **rainu** (sends a message and delete them immediately)
+```sh
+curl -X POST -v localhost:8080/api/v1/trigger/u/rainu --data 'SPAM!!!'
+```
+
+Trigger the room **public** (sends a message and delete them immediately)
+```sh
+curl -X POST -v localhost:8080/api/v1/trigger/r/public --data 'SPAM!!!'
 ```
 
 ## Documentation
@@ -48,8 +58,10 @@ curl -X POST -v localhost:8080/api/v1/send/r/public --data 'Hello public World!'
 
 | Method  | Path      | Variables     | Body |  Description  |
 | ------- | --------- | ------------- | ---- | ------------- |
-| POST | /api/v1/send/u/${username} | username - the recipient of the message | 1:1 the message to send | Send a message to the given user. |
-| POST | /api/v1/send/r/${room} | room - the target room of the message | 1:1 the message to send | Send a message to the given room/channel. |
+| POST | /api/v1/send/u/${username} | username - the recipient of the message | 1:1 the message to send | Sends a message to the given user. |
+| POST | /api/v1/send/r/${room} | room - the target room of the message | 1:1 the message to send | Sends a message to the given room/channel. |
+| POST | /api/v1/trigger/u/${username} | username - the recipient of the message | 1:1 the message to send | Sends a message to the given user and delete them immediately. |
+| POST | /api/v1/trigger/r/${room} | room - the target room of the message | 1:1 the message to send | Sends a message to the given room/channel and delete them immediately. |
 
 ## Development setup
 
@@ -69,6 +81,9 @@ go build
 
 ## Release History
 
+* 0.0.2
+    * Endpoint for trigger a user
+    * Endpoint for trigger a whole room
 * 0.0.1
     * Endpoint for sending a message to a user
     * Endpoint for sending a message to a room

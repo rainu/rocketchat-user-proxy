@@ -6,6 +6,16 @@ type Message struct {
 	Message string `json:"msg"`
 }
 
+type SendMessageResponseResult struct {
+	Id string `json:"_id"`
+}
+
+type SendMessageResponse struct {
+	Id     string                    `json:"id"`
+	Msg    string                    `json:"msg"`
+	Result SendMessageResponseResult `json:"result"`
+}
+
 const DefaultRoom = "GENERAL"
 
 func NewSendMessageToDefaultRoom(message string) *MethodCall {
