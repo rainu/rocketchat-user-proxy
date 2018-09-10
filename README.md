@@ -16,7 +16,7 @@ docker run -p 8080:8080 \
        rainu/rocketchat-user-proxy
 ```
 
-You have to replace *<chat-host>*, *<chat-username>*, *<chat-user-password>* with your own values.
+You have to replace **&lt;chat-host&gt;**, **&lt;chat-username&gt;**, **&lt;chat-user-password&gt;** with your own values.
 
 ## Usage example
 
