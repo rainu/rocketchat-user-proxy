@@ -3,10 +3,10 @@ package server
 import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/rainu/rocketchat-user-proxy/internal/client"
+	"github.com/rainu/rocketchat-user-proxy/internal/server/handler"
 	"net/http"
 	"os"
-	"rocketchat-user-proxy/client"
-	"rocketchat-user-proxy/server/handler"
 )
 
 func NewRouter(chat client.RocketChat) *mux.Router {

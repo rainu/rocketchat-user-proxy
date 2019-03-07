@@ -1,6 +1,7 @@
-FROM golang:1.10 as buildContainer
+FROM golang:1.11 as buildContainer
 
 ENV CGO_ENABLED=0
+ENV GO111MODULE=on
 ENV GOOS=linux
 ENV GOPATH=/
 
@@ -8,7 +9,7 @@ COPY . /src/rocketchat-user-proxy
 WORKDIR /src/rocketchat-user-proxy
 
 RUN go get ./... &&\
-    go build -ldflags -s -a -installsuffix cgo
+    go build -ldflags -s -a -installsuffix cgo -o rocketchat-user-proxy ./cmd/proxy/
 
 
 FROM alpine

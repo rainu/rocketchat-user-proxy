@@ -1,4 +1,4 @@
-package config
+package main
 
 import (
 	"github.com/alexflint/go-arg"
@@ -18,7 +18,7 @@ type chatConfig struct {
 	PasswordHash  string `arg:"--chat-password-hash,env:CHAT_PASSWORD_HASH,help:The user hashed password (sha-256)."`
 }
 
-func New() *Config {
+func NewConfig() *Config {
 	cfg := &Config{
 		chatConfig: chatConfig{},
 		BindPort:   8080,

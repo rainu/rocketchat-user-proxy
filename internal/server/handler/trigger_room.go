@@ -2,9 +2,9 @@ package handler
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/rainu/rocketchat-user-proxy/internal/client"
 	"io/ioutil"
 	"net/http"
-	"rocketchat-user-proxy/client"
 )
 
 type triggerRoomHandler struct {

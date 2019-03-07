@@ -2,24 +2,24 @@ package handler
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/rainu/rocketchat-user-proxy/internal/client"
 	"io/ioutil"
 	"net/http"
-	"rocketchat-user-proxy/client"
 )
 
-type sendUserHandler struct {
+type sendRoomHandler struct {
 	Chat client.RocketChat
 }
 
-func NewSendUserHandler(chat client.RocketChat) http.Handler {
-	return &sendUserHandler{
+func NewSendRoomHandler(chat client.RocketChat) http.Handler {
+	return &sendRoomHandler{
 		Chat: chat,
 	}
 }
 
-func (s *sendUserHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (s *sendRoomHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
-	user := vars["user"]
+	room := vars["room"]
 
 	rawMessage, err := ioutil.ReadAll(request.Body)
 
@@ -29,7 +29,7 @@ func (s *sendUserHandler) ServeHTTP(writer http.ResponseWriter, request *http.Re
 	}
 
 	//send message
-	s.Chat.SendDirectMessage(string(rawMessage), user)
+	s.Chat.SendRoomMessage(string(rawMessage), room)
 
 	writer.WriteHeader(http.StatusCreated)
 }

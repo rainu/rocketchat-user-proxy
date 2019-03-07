@@ -76,7 +76,7 @@ git clone git@github.com:rainu/rocketchat-user-proxy.git
 
 cd rocketchat-user-proxy
 go get ./...
-go build
+go build -ldflags -s -a -installsuffix cgo ./cmd/proxy/
 ```
 
 ## Release History
