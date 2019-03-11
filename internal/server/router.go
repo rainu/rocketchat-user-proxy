@@ -9,18 +9,14 @@ import (
 	"os"
 )
 
-func NewRouter(chat client.RocketChat) *mux.Router {
+func NewRouter(chat client.RocketChat) http.Handler {
 	router := mux.NewRouter()
 
 	// RESTful API
-	router.Handle("/api/v1/send/u/{user}", handlers.LoggingHandler(os.Stdout, handler.NewSendUserHandler(chat))).
-		Methods(http.MethodPost)
-	router.Handle("/api/v1/trigger/u/{user}", handlers.LoggingHandler(os.Stdout, handler.NewTriggerUserHandler(chat))).
-		Methods(http.MethodPost)
-	router.Handle("/api/v1/send/r/{room}", handlers.LoggingHandler(os.Stdout, handler.NewSendRoomHandler(chat))).
-		Methods(http.MethodPost)
-	router.Handle("/api/v1/trigger/r/{room}", handlers.LoggingHandler(os.Stdout, handler.NewTriggerRoomHandler(chat))).
-		Methods(http.MethodPost)
+	router.Handle("/api/v1/send/u/{user}", handler.NewSendUserHandler(chat)).Methods(http.MethodPost)
+	router.Handle("/api/v1/trigger/u/{user}", handler.NewTriggerUserHandler(chat)).Methods(http.MethodPost)
+	router.Handle("/api/v1/send/r/{room}", handler.NewSendRoomHandler(chat)).Methods(http.MethodPost)
+	router.Handle("/api/v1/trigger/r/{room}", handler.NewTriggerRoomHandler(chat)).Methods(http.MethodPost)
 
-	return router
+	return handlers.LoggingHandler(os.Stdout, router)
 }
