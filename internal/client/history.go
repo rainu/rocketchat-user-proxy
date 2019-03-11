@@ -2,7 +2,7 @@ package client
 
 import (
 	"encoding/json"
-	"rocketchat-user-proxy/messages"
+	"github.com/rainu/rocketchat-user-proxy/internal/messages"
 )
 
 type History interface {

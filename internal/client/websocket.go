@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
-	"rocketchat-user-proxy/log"
-	"rocketchat-user-proxy/messages"
+	"github.com/rainu/rocketchat-user-proxy/internal/log"
+	"github.com/rainu/rocketchat-user-proxy/internal/messages"
 	"sync"
 )
 

@@ -2,8 +2,8 @@ package client
 
 import (
 	"encoding/json"
-	"rocketchat-user-proxy/log"
-	"rocketchat-user-proxy/messages"
+	"github.com/rainu/rocketchat-user-proxy/internal/log"
+	"github.com/rainu/rocketchat-user-proxy/internal/messages"
 )
 
 func (rc *rcClient) sendMessage(message *messages.MethodCall) {

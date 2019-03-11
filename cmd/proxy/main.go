@@ -3,19 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/rainu/rocketchat-user-proxy/internal/client"
+	"github.com/rainu/rocketchat-user-proxy/internal/log"
+	"github.com/rainu/rocketchat-user-proxy/internal/server"
 	"net/http"
 	"os"
 	"os/signal"
-	"rocketchat-user-proxy/client"
-	"rocketchat-user-proxy/config"
-	"rocketchat-user-proxy/log"
-	"rocketchat-user-proxy/server"
 	"syscall"
 	"time"
 )
 
 func main() {
-	cfg := config.New()
+	cfg := NewConfig()
 
 	rc := client.NewRocketChat(cfg.WSUrl)
 	err := rc.Start()
@@ -46,7 +45,7 @@ func main() {
 	<-stop
 }
 
-func startServer(chat client.RocketChat, cfg *config.Config) *http.Server {
+func startServer(chat client.RocketChat, cfg *Config) *http.Server {
 	router := server.NewRouter(chat)
 	httpServer := &http.Server{Addr: fmt.Sprintf(":%v", cfg.BindPort), Handler: router}
 
