@@ -80,7 +80,8 @@ go build -ldflags -s -a -installsuffix cgo ./cmd/proxy/
 ```
 
 ## Release History
-
+* 0.0.3
+    * Transform to go-modules project
 * 0.0.2
     * Endpoint for trigger a user
     * Endpoint for trigger a whole room
